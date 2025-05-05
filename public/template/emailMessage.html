@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperación de contraseña</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700">
+    <style>
+        body{
+            background: #154380;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <h2>Hola, {{first_name}}!</h2>
+    <p>Has solicitado recuperar tu contraseña. Aquí tienes una nueva contraseña temporal:</p>
+    <p style="font-size: 20px; font-weight: bold; color: #007BFF;">{{password}}</p>
+    <p>Te recomendamos cambiarla después de iniciar sesión.</p>
+    <br />
+    <p>Atentamente,<br><strong>El equipo de Demariot</strong></p>
+</body>
+</html>
