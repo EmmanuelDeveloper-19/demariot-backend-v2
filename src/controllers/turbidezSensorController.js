@@ -29,7 +29,7 @@ exports.create = async(req, res) => {
 exports.get = async(req, res) => {
     try {
         const turbitySensor = await turbity.find();
-        res.status(200).json({ message: "Datos del sensor obtenidos correctamente. ", turbity});
+        res.status(200).json({ message: "Datos del sensor obtenidos correctamente. ", turbitySensor});
     } catch(error){
         res.status(500).json({message: "Error al obtener los datos del sensor. ", error});
     }

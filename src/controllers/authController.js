@@ -11,11 +11,11 @@ function generateRandomPassword(length = 8) {
     return crypto.randomBytes(length).toString('base64').slice(0, length);
 }
 
-function renderTemplate(templatePath, variables){
+function renderTemplate(templatePath, variables) {
     let template = fs.readFileSync(templatePath, "utf8");
-    for (const key in variables){
+    for (const key in variables) {
         template = template.replace(new RegExp(`{{${key}}}`, "g"), variables[key]);
-    } 
+    }
     return template;
 }
 
@@ -94,43 +94,87 @@ exports.logout = (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
-    const userId = req.params.id;
-    const { first_name, last_name, email, phone, address } = req.body;
-    const file = req.file;
+    try {
+        const userId = req.params.id;
+        const {
+            first_name,
+            last_name,
+            email,
+            phone,
+            address,
+        } = req.body;
+        const file = req.file;
 
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
+        const existingUser = await User.findById(userId);
 
-    if (email && email !== user.email) {
-        const emailExist = await User.findOne({ email });
-        if (emailExist) return res.status(409).json({ message: "Email already in use" });
-    }
-
-    Object.assign(user, { first_name, last_name, email, phone });
-
-    let parsedAddress = address;
-    if (typeof address === "string") {
-        try { parsedAddress = JSON.parse(address); } 
-        catch {
-            return res.status(400).json({ message: "Invalid address format" });
+        if (email && email !== existingUser.email) {
+            const emailExist = await User.findOne({ email });
+            if (emailExist) {
+                throw new Error("El email ya esta en uso")
+            }
         }
-    }
 
-    if (parsedAddress) Object.assign(user.address, parsedAddress);
+        if (first_name) existingUser.first_name = first_name;
+        if (first_name) existingUser.first_name = first_name;
+        if (last_name) existingUser.last_name = last_name;
+        if (email) existingUser.email = email;
+        if (phone) existingUser.phone = phone;
+        let parsedAddress = address;
 
-    if (file) {
-        if (user.profile_picture) {
-            const oldImage = path.join(__dirname, "..", "uploads", path.basename(user.profile_picture));
-            fs.existsSync(oldImage) && fs.unlinkSync(oldImage);
+        if (typeof address === "string") {
+            try {
+                parsedAddress = JSON.parse(address);
+            } catch (e) {
+                console.error("Dirección malformada:", address);
+                return res.status(400).json({ message: "Dirección inválida" });
+            }
         }
-        user.profile_picture = `/uploads/${file.filename}`;
+
+        if (parsedAddress) {
+            if (parsedAddress.street !== undefined) existingUser.address.street = parsedAddress.street;
+            if (parsedAddress.city !== undefined) existingUser.address.city = parsedAddress.city;
+            if (parsedAddress.state !== undefined) existingUser.address.state = parsedAddress.state;
+            if (parsedAddress.zip !== undefined) existingUser.address.zip = parsedAddress.zip;
+            if (parsedAddress.country !== undefined) existingUser.address.country = parsedAddress.country;
+        }
+
+        if (file) {
+            if (existingUser.profile_picture) {
+                const oldImagePath = path.join(__dirname, '..', 'uploads', existingUser.profile_picture.split('/').pop());
+                fs.stat(oldImagePath, (err, stats) => {
+                    if (err) {
+                        return;
+                    }
+    
+                    if (stats.isFile()) {
+                        // Se elimina la foto anterior
+                        fs.unlink(oldImagePath, (err) => {
+                            if (err) {
+                                // Error al eliminar la foto anterior, no se hace nada
+                            }
+                        });
+                    }
+                });
+            }
+    
+            existingUser.profile_picture = `/uploads/${file.filename}`;
+        }
+
+        existingUser.updated_at = new Date();
+
+        await existingUser.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Usuario actualizado correctamente",
+            user: existingUser
+        });
+        
+    } catch(error) {
+        res.status(500).json({message: "Ocurrio un error", erro});
     }
-
-    user.updated_at = new Date();
-    await user.save();
-
-    res.status(200).json({ success: true, message: "User updated", user });
 };
+
 
 exports.changePassword = async (req, res) => {
     const { id } = req.params;
