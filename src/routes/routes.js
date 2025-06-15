@@ -1,3 +1,4 @@
+
 const express = require("express");
 const path = require("path");
 
@@ -13,6 +14,7 @@ const tempSensorController = require("../controllers/tempSensorController");
 const humiditySensorController = require("../controllers/humiditySensorController");
 const colorimetrySensorController = require("../controllers/colorimetrySensorController");
 const prototypeController = require("../controllers/prototypeController");
+const muestraController = require("../controllers/muestraController");
 const upload = require("../config/multerConfig");
 
 const router = express.Router();
@@ -54,8 +56,9 @@ router.get("/users/:id/photo", async (req, res) => {
     }
 });
 
-
+/* ============================================================ */
 /* ========= Rutas para obtener datos de sensores ============= */
+/* ============================================================ */
 router.post("/create-ph-sensor", phSensorController.create);
 router.get("/get-ph-sensor", phSensorController.get);
 router.post("/create-turbidez-sensor", turbidezSensorController.create);
@@ -68,4 +71,8 @@ router.post("/create-humidity-sensor", humiditySensorController.create);
 router.get("/get-humidity-sensor", humiditySensorController.get);
 router.post("/create-prototype", prototypeController.create);
 router.get("/get-prototype", prototypeController.get);
+router.post("/create-muestra", muestraController.create);
+router.get("/get-muestra", muestraController.get);
+
 module.exports = router;
+
