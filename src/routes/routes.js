@@ -15,6 +15,7 @@ const humiditySensorController = require("../controllers/humiditySensorControlle
 const colorimetrySensorController = require("../controllers/colorimetrySensorController");
 const prototypeController = require("../controllers/prototypeController");
 const muestraController = require("../controllers/muestraController");
+const predictionController = require("../controllers/predictionController");
 const upload = require("../config/multerConfig");
 
 const router = express.Router();
@@ -73,6 +74,10 @@ router.post("/create-prototype", prototypeController.create);
 router.get("/get-prototype", prototypeController.get);
 router.post("/create-muestra", muestraController.create);
 router.get("/get-muestra", muestraController.get);
+router.post("/create-prediction", predictionController.create);
+router.post("/create-many-prediction", predictionController.createMany);
+router.get("/get-prediction", predictionController.get);
+
 
 module.exports = router;
 

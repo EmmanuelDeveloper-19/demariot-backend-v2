@@ -15,3 +15,4 @@ const humiditySchema = new mongoose.Schema({
 const humidity = mongoose.model("humiditySensor", humiditySchema);
 module.exports = humidity;
 
+
